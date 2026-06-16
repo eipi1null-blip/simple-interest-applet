@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Interest Visual Applet</title>
+    <style>
+:root {
+  --ink: #17212f;
+  --muted: #5e6b7a;
+  --paper: #ffffff;
+  --page: #f3f6f8;
+  --line: #dbe2ea;
+  --green: #72b84b;
+  --green-dark: #397d3a;
+  --gold: #f8c94c;
+  --gold-dark: #d79b21;
+  --blue: #2376b9;
+  --violet: #8659b5;
+  --orange: #ef9141;
+  --shadow: 0 18px 40px rgba(25, 36, 52, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(243, 246, 248, 0.96)),
+    radial-gradient(circle at 10% 8%, rgba(114, 184, 75, 0.18), transparent 32%),
+    radial-gradient(circle at 92% 7%, rgba(35, 118, 185, 0.12), transparent 28%),
+    var(--page);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app {
+  width: min(1180px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 22px 0 28px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 16px;
+}
+
+.hero,
+.tool,
+.analysis-grid {
+  width: 100%;
+}
+
+.hero > div,
+.formula-card,
+.controls,
+.stage,
+.chart-panel,
+.table-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.hero > div:first-child {
+  padding: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 850px;
+  margin-bottom: 12px;
+  font-size: clamp(2rem, 4.2vw, 4.2rem);
+  line-height: 0.96;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+}
+
+.intro {
+  max-width: 72ch;
+  margin-bottom: 0;
+  color: #38475a;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.formula-card {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fff4);
+}
+
+.formula-card span,
+.formula-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.formula-card span {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.formula-card strong {
+  font-size: 1.55rem;
+}
+
+.tool {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.controls {
+  padding: 18px;
+}
+
+.controls label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 8px;
+  color: #2f3d50;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+output {
+  color: var(--blue);
+}
+
+input[type="range"],
+select,
+button {
+  width: 100%;
+}
+
+input[type="range"] {
+  accent-color: var(--green-dark);
+}
+
+select {
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  background: white;
+}
+
+button {
+  min-height: 44px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+button:hover {
+  background: #26364a;
+}
+
+.stage {
+  position: relative;
+  min-height: 390px;
+  overflow: hidden;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 249, 223, 0.76)),
+    var(--paper);
+}
+
+.people {
+  position: relative;
+  height: 98px;
+}
+
+.speech {
+  position: absolute;
+  left: 100px;
+  top: 8px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 850;
+  box-shadow: 0 8px 18px rgba(68, 128, 50, 0.2);
+}
+
+.speech::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: -11px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid var(--green);
+}
+
+.person {
+  position: absolute;
+  width: 52px;
+  height: 96px;
+}
+
+.person-left {
+  left: 18px;
+  top: 2px;
+}
+
+.person-right {
+  right: 18px;
+  top: 2px;
+  transform: scaleX(-1);
+}
+
+.head,
+.body,
+.legs {
+  position: absolute;
+  display: block;
+}
+
+.head {
+  left: 18px;
+  top: 0;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #ffd49c;
+  box-shadow: -7px 2px 0 var(--blue);
+}
+
+.body {
+  left: 12px;
+  top: 25px;
+  width: 28px;
+  height: 42px;
+  border-radius: 12px 12px 4px 4px;
+  background: var(--green);
+}
+
+.person-right .body {
+  background: var(--violet);
+}
+
+.legs {
+  left: 11px;
+  top: 64px;
+  width: 34px;
+  height: 30px;
+  border-left: 8px solid var(--orange);
+  border-right: 8px solid #7abf55;
+  transform: skewX(-8deg);
+}
+
+.coin-scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(170px, 240px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: end;
+  min-height: 250px;
+  padding: 20px 26px 28px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fffdf7 0%, #fff7d2 100%);
+}
+
+.arrow-track {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 24px;
+  height: 18px;
+  border-radius: 999px;
+  background: #f6cf6f;
+}
+
+.arrow-track::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: -8px;
+  border-left: 24px solid #f6cf6f;
+  border-top: 17px solid transparent;
+  border-bottom: 17px solid transparent;
+}
+
+.stack-block,
+.interest-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+}
+
+.stack-label,
+.interest-label,
+.amount {
+  min-height: 20px;
+  color: #314258;
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.amount {
+  color: var(--green-dark);
+}
+
+.growth-notes {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.coin-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 3px;
+  width: 72px;
+  min-height: 108px;
+}
+
+.growing-stack {
+  width: 104px;
+  min-height: 190px;
+  padding-bottom: 4px;
+}
+
+.coin {
+  height: 11px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.44), transparent 36%),
+    linear-gradient(180deg, #ffe38a 0%, var(--gold) 58%, #e7aa28 100%);
+  box-shadow: inset 0 -1px 0 rgba(147, 93, 14, 0.28);
+}
+
+.principal-coin {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.44), transparent 36%),
+    linear-gradient(180deg, #ffe38a 0%, var(--gold) 58%, #e7aa28 100%);
+}
+
+.interest-coin {
+  border-color: #4f972f;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.44), transparent 36%),
+    linear-gradient(180deg, #bfe979 0%, #81c95a 62%, #55a73c 100%);
+}
+
+.new-coin {
+  animation: dropIn 420ms ease-out both;
+}
+
+.growth-card {
+  min-height: 76px;
+  padding: 10px 12px;
+  border: 1px solid #dce8d6;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.growth-card strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--green-dark);
+  font-size: 0.92rem;
+}
+
+.growth-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+@keyframes dropIn {
+  from {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 16px;
+}
+
+.chart-panel,
+.table-panel {
+  padding: 18px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 330px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5ebf3;
+  text-align: right;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+th {
+  background: #edf3fb;
+  color: #25344a;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 920px) {
+  .hero,
+  .tool,
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coin-scene {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+@media (max-width: 620px) {
+  .app {
+    width: min(100% - 18px, 1180px);
+    padding-top: 10px;
+  }
+
+  .people {
+    height: 70px;
+  }
+
+  .person {
+    transform: scale(0.72);
+    transform-origin: top left;
+  }
+
+  .person-right {
+    transform: scaleX(-1) scale(0.72);
+    transform-origin: top right;
+  }
+
+  .speech {
+    left: 70px;
+    font-size: 0.82rem;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Simple Interest</p>
+          <h1>Same Interest, Added Again and Again</h1>
+          <p class="intro">
+            Move the sliders to see how simple interest grows. The original
+            principal stays the same, and each period adds the same interest
+            amount.
+          </p>
+        </div>
+        <div class="formula-card" aria-live="polite">
+          <span>Formula</span>
+          <strong id="formula">A = 4000(1 + 0.04t)</strong>
+          <small id="interestLine">Interest each year: 160</small>
+        </div>
+      </section>
+
+      <section class="tool">
+        <aside class="controls" aria-label="Simple interest controls">
+          <h2>Controls</h2>
+
+          <label for="principal">
+            Principal
+            <output id="principalValue">4000</output>
+          </label>
+          <input id="principal" type="range" min="500" max="10000" step="500" value="4000" />
+
+          <label for="rate">
+            Annual rate
+            <output id="rateValue">4%</output>
+          </label>
+          <input id="rate" type="range" min="1" max="15" step="0.5" value="4" />
+
+          <label for="years">
+            Years
+            <output id="yearsValue">5</output>
+          </label>
+          <input id="years" type="range" min="0" max="12" step="1" value="5" />
+
+          <label for="mode">
+            View
+            <output id="modeValue">yearly</output>
+          </label>
+          <select id="mode">
+            <option value="yearly">Yearly deposits</option>
+            <option value="total">Total balance</option>
+          </select>
+
+          <button id="reset" type="button">Reset</button>
+        </aside>
+
+        <section class="stage" aria-label="Coin stack simple interest visualization">
+          <div class="people">
+            <div class="person person-left" aria-hidden="true">
+              <span class="head"></span>
+              <span class="body"></span>
+              <span class="legs"></span>
+            </div>
+            <div class="speech">Simple interest adds equal amounts</div>
+            <div class="person person-right" aria-hidden="true">
+              <span class="head"></span>
+              <span class="body"></span>
+              <span class="legs"></span>
+            </div>
+          </div>
+
+          <div class="coin-scene">
+            <div class="arrow-track"></div>
+            <div class="stack-block">
+              <div class="stack-label">Account balance</div>
+              <div class="coin-stack growing-stack" id="balanceStack"></div>
+              <div class="amount" id="baseAmount">4000</div>
+            </div>
+            <div class="growth-notes" id="interestStrip"></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="analysis-grid">
+        <section class="chart-panel">
+          <h2>Balance Over Time</h2>
+          <canvas id="chart" width="900" height="360" aria-label="Simple interest balance graph"></canvas>
+        </section>
+
+        <section class="table-panel">
+          <h2>Table</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Interest Added</th>
+                <th>Total Interest</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </section>
+      </section>
+    </main>
+
+    <script>
+const principalInput = document.querySelector("#principal");
+const rateInput = document.querySelector("#rate");
+const yearsInput = document.querySelector("#years");
+const modeSelect = document.querySelector("#mode");
+const resetButton = document.querySelector("#reset");
+
+const principalValue = document.querySelector("#principalValue");
+const rateValue = document.querySelector("#rateValue");
+const yearsValue = document.querySelector("#yearsValue");
+const modeValue = document.querySelector("#modeValue");
+const formula = document.querySelector("#formula");
+const interestLine = document.querySelector("#interestLine");
+const balanceStack = document.querySelector("#balanceStack");
+const baseAmount = document.querySelector("#baseAmount");
+const interestStrip = document.querySelector("#interestStrip");
+const rows = document.querySelector("#rows");
+const canvas = document.querySelector("#chart");
+const ctx = canvas.getContext("2d");
+
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0
+});
+
+function money(value) {
+  return moneyFormatter.format(Math.round(value));
+}
+
+function getState() {
+  const principal = Number(principalInput.value);
+  const rate = Number(rateInput.value) / 100;
+  const years = Number(yearsInput.value);
+  const maxYears = Number(yearsInput.max);
+  const yearlyInterest = principal * rate;
+  return { principal, rate, years, maxYears, yearlyInterest };
+}
+
+function balanceAt({ principal, yearlyInterest }, year) {
+  return principal + yearlyInterest * year;
+}
+
+function createCoin(className = "") {
+  const coin = document.createElement("span");
+  coin.className = `coin ${className}`.trim();
+  return coin;
+}
+
+function renderStack(container, coinCount, className = "", animated = false) {
+  container.innerHTML = "";
+  for (let i = 0; i < coinCount; i += 1) {
+    container.appendChild(createCoin(`${className} ${animated ? "new-coin" : ""}`));
+  }
+}
+
+function renderScene(state) {
+  const { principal, years, yearlyInterest } = state;
+  const principalCoins = 8;
+  const interestCoinsPerYear = Math.max(1, Math.round((yearlyInterest / principal) * 20));
+
+  balanceStack.innerHTML = "";
+  for (let i = 0; i < principalCoins; i += 1) {
+    balanceStack.appendChild(createCoin("principal-coin"));
+  }
+  for (let year = 1; year <= years; year += 1) {
+    for (let i = 0; i < interestCoinsPerYear; i += 1) {
+      const animated = year === years;
+      balanceStack.appendChild(createCoin(`interest-coin ${animated ? "new-coin" : ""}`));
+    }
+  }
+
+  baseAmount.textContent = `A = ${money(balanceAt(state, years))}`;
+  interestStrip.innerHTML = "";
+
+  if (years === 0) {
+    const card = document.createElement("article");
+    card.className = "growth-card";
+    card.innerHTML = `<strong>Starting amount</strong><span>Only the principal is shown: ${money(principal)}.</span>`;
+    interestStrip.appendChild(card);
+    return;
+  }
+
+  const visibleYears = Math.min(years, 6);
+  for (let year = 1; year <= visibleYears; year += 1) {
+    const card = document.createElement("article");
+    card.className = "growth-card";
+    card.innerHTML = `
+      <strong>Year ${year}</strong>
+      <span>add ${money(yearlyInterest)} interest</span>
+      <span>balance: ${money(balanceAt(state, year))}</span>
+    `;
+    interestStrip.appendChild(card);
+  }
+
+  if (years > visibleYears) {
+    const more = document.createElement("article");
+    more.className = "growth-card";
+    more.innerHTML = `<strong>More years</strong><span>${years - visibleYears} more equal interest layers are included in the stack.</span>`;
+    interestStrip.appendChild(more);
+  }
+}
+
+function renderTable(state) {
+  rows.innerHTML = "";
+  for (let year = 0; year <= state.years; year += 1) {
+    const interest = year === 0 ? 0 : state.yearlyInterest;
+    const totalInterest = state.yearlyInterest * year;
+    const balance = balanceAt(state, year);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${year}</td>
+      <td>${year === 0 ? "-" : money(interest)}</td>
+      <td>${money(totalInterest)}</td>
+      <td>${money(balance)}</td>
+    `;
+    rows.appendChild(tr);
+  }
+}
+
+function drawChart(state) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const width = rect.width;
+  const height = rect.height;
+  const pad = { left: 62, right: 28, top: 28, bottom: 48 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const maxBalance = balanceAt(state, state.maxYears);
+  const maxY = Math.ceil(maxBalance / 500) * 500;
+  const minY = 0;
+
+  const xFor = (year) => pad.left + (year / state.maxYears) * plotW;
+  const yFor = (amount) => pad.top + (1 - (amount - minY) / (maxY - minY)) * plotH;
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = "#dfe7f1";
+  ctx.lineWidth = 1;
+  ctx.fillStyle = "#66758a";
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  for (let i = 0; i <= 5; i += 1) {
+    const value = minY + ((maxY - minY) / 5) * i;
+    const y = yFor(value);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(width - pad.right, y);
+    ctx.stroke();
+    ctx.fillText(money(value), pad.left - 10, y);
+  }
+
+  ctx.strokeStyle = "#9aa8ba";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, height - pad.bottom);
+  ctx.lineTo(width - pad.right, height - pad.bottom);
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let year = 0; year <= state.maxYears; year += 1) {
+    if (state.maxYears > 8 && year % 2 === 1) continue;
+    ctx.fillText(year, xFor(year), height - pad.bottom + 14);
+  }
+
+  const futurePoints = [];
+  const points = [];
+  for (let year = 0; year <= state.maxYears; year += 1) {
+    const point = { x: year, y: balanceAt(state, year) };
+    if (year <= state.years) points.push(point);
+    if (year >= state.years) futurePoints.push(point);
+  }
+
+  drawDashedLine(futurePoints, xFor, yFor, "rgba(35, 118, 185, 0.22)", 3);
+  drawLine(points, xFor, yFor, "#2376b9", 4);
+  drawPoints(points, xFor, yFor, "#174f7c");
+
+  if (modeSelect.value === "yearly") {
+    drawInterestBars(state, xFor, yFor);
+  }
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#174f7c";
+  ctx.font = "700 13px system-ui, sans-serif";
+  ctx.fillText("Balance grows by a constant amount", pad.left + 10, pad.top + 14);
+}
+
+function drawInterestBars(state, xFor, yFor) {
+  ctx.save();
+  ctx.strokeStyle = "rgba(114, 184, 75, 0.65)";
+  ctx.lineWidth = 2;
+  for (let year = 1; year <= state.years; year += 1) {
+    const x = xFor(year);
+    const y1 = yFor(balanceAt(state, year - 1));
+    const y2 = yFor(balanceAt(state, year));
+    ctx.beginPath();
+    ctx.moveTo(x + 7, y1);
+    ctx.lineTo(x + 7, y2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawLine(points, xFor, yFor, color, width) {
+  if (points.length === 0) return;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    const x = xFor(point.x);
+    const y = yFor(point.y);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+
+function drawDashedLine(points, xFor, yFor, color, width) {
+  ctx.save();
+  ctx.setLineDash([8, 9]);
+  drawLine(points, xFor, yFor, color, width);
+  ctx.restore();
+}
+
+function drawPoints(points, xFor, yFor, color) {
+  ctx.fillStyle = color;
+  points.forEach((point) => {
+    ctx.beginPath();
+    ctx.arc(xFor(point.x), yFor(point.y), 5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function render() {
+  const state = getState();
+  const ratePercent = state.rate * 100;
+  principalValue.textContent = money(state.principal);
+  rateValue.textContent = `${ratePercent.toFixed(ratePercent % 1 === 0 ? 0 : 1)}%`;
+  yearsValue.textContent = state.years;
+  modeValue.textContent = modeSelect.value;
+  formula.textContent = `A = ${money(state.principal)}(1 + ${state.rate.toFixed(3)}t)`;
+  interestLine.textContent = `Interest each year: ${money(state.yearlyInterest)}`;
+
+  renderScene(state);
+  renderTable(state);
+  drawChart(state);
+}
+
+[principalInput, rateInput, yearsInput, modeSelect].forEach((control) => {
+  control.addEventListener("input", render);
+});
+
+resetButton.addEventListener("click", () => {
+  principalInput.value = 4000;
+  rateInput.value = 4;
+  yearsInput.value = 5;
+  modeSelect.value = "yearly";
+  render();
+});
+
+window.addEventListener("resize", render);
+render();
+
+    </script>
+  </body>
+</html>
